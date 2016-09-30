@@ -31,15 +31,18 @@ def crawl(url_list):
     # get 18+ cookies
     res = getOver18cookie(res)
 
+    rslt = []
     # 送出GET請求到遠端伺服器，伺服器接受請求後回傳<Response [200]>，代表請求成功
-    ptt_content = res.get("https://www.ptt.cc/bbs/Soft_Job/index.html")
+    for item in url_list:
+        ptt_content = res.get("https://www.ptt.cc/" + item )
 
-    #get board Index html
-    soup = BeautifulSoup( ptt_content.text, "html.parser")
+        #get board Index html
+        soup = BeautifulSoup( ptt_content.text, "html.parser")
+
+        #get article
+        rslt.append( parse_article(soup) )
 
 
-    #get preview index
-    idx = get_ptt_last_index(soup)
 
 
 def parse_article(soup):
@@ -101,41 +104,3 @@ def article_url_list(soup):
 
 
 if __name__ == '__main__':
-    # crawl()
-    # Create a requests Session
-    # res = requests.session()
-    #
-    # # get 18+ cookies
-    # res = getOver18cookie(res)
-    #
-    # # 送出GET請求到遠端伺服器，伺服器接受請求後回傳<Response [200]>，代表請求成功
-    # ptt_content = res.get("https://www.ptt.cc/bbs/Soft_Job/index.html")
-    #
-    # #get board Index html
-    # soup = BeautifulSoup( ptt_content.text, "html.parser")
-    #
-    # # get_ptt_last_index(res, 'sex')
-    #
-    # # divs = soup.find_all("div",{"class": "r-ent"})
-    # #
-    # # for item in divs:
-    # #     print item.find('div','date').string, item.a.string, item.a.get('href')
-    #
-    # # get article
-    # article_content = res.get("https://www.ptt.cc/bbs/Soft_Job/M.1475211883.A.F11.html")
-    #
-    # soup = BeautifulSoup( article_content.text, "html.parser")
-
-    soup = BeautifulSoup(open("tmp.html"), "html.parser")
-
-    # select return is list, 每一個元素是Tag
-    # find return is Tag
-    # find all return is set , element is Tag
-    # parse_article(soup)
-
-
-    # Create a requests Session
-    res = requests.session()
-
-    # get 18+ cookies
-    res = getOver18cookie(res)
