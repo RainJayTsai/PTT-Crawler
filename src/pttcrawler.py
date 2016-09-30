@@ -34,6 +34,7 @@ def crawl(url_list):
     rslt = []
     # 送出GET請求到遠端伺服器，伺服器接受請求後回傳<Response [200]>，代表請求成功
     for item in url_list:
+
         ptt_content = res.get("https://www.ptt.cc/" + item )
 
         #get board Index html
@@ -69,8 +70,12 @@ def parse_article(soup):
     contents = main_content.get_text()
 
     # push message
-    message = [];
+    message = []
     for item in pushlist:
+        # fix the push is too large bug
+        if not item.find('span',"push-tag"):
+            continue
+
         message.append({ "push_tag": item.contents[0].string,
           "user_id" : item.contents[1].string,
           "push_content": item.contents[2].string ,
@@ -101,6 +106,45 @@ def article_url_list(soup):
             pass
     return rslt
 
+def get_borad_content(res, board, index = ""):
+    content = res.get('https://www.ptt.cc/bbs/' + board + '/index' + index + '.html')
+    soup = BeautifulSoup(content.text, "html.parser")
+
+    return soup
+
+def main():
+    from sys import argv
+    board = argv[1]
+    pages = 1
+    print board
+    print pages
+    if len(argv) == 3:
+        try:
+            pages = int(argv[2])
+        except ValueError:
+            print("That's not an number!")
+    elif len(argv) == 1:
+        raise Exception('argument number error!') # don't, if you catch, likely to hide bugs.
+
+
+    # Ceata a request seesion
+    res = requests.session()
+
+    #fake over 18( get cookie 18 )
+    res = getOver18cookie(res)
+
+
+    #get article url
+    soup = get_borad_content(res, board)
+    url_lists = article_url_list(soup)
+
+
+    for i in range(0,pages):
+        print crawl(url_lists)
+        index = get_ptt_last_index(soup)
+        soup = get_borad_content(res,board,index)
+        url_lists = article_url_list(soup)
 
 
 if __name__ == '__main__':
+    main()
