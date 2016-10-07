@@ -23,7 +23,7 @@ def get_ptt_last_index(soup):
     return lastindex
 
 
-def crawl(url_list):
+def crawl(url_list,title=None):
 
     # Create a requests Session
     res = requests.session()
@@ -97,14 +97,16 @@ def parse_article(soup):
 def article_url_list(soup):
     divs = soup.find_all("div",{"class": "r-ent"})
 
-    rslt = []
+    rslt_url = []
+    rslt_title = []
     for item in divs:
         try:
-            rslt.append(item.a.get('href'))
+            rslt_url.append(item.a.get('href'))
+            rslt_title.append(item.a.string)
         except:
             #when article is delete do nothing
             pass
-    return rslt
+    return rslt_url, rslt_title
 
 def get_borad_content(res, board, index = ""):
     content = res.get('https://www.ptt.cc/bbs/' + board + '/index' + index + '.html')
@@ -116,8 +118,7 @@ def main():
     from sys import argv
     board = argv[1]
     pages = 1
-    print board
-    print pages
+
     if len(argv) == 3:
         try:
             pages = int(argv[2])
@@ -140,7 +141,7 @@ def main():
 
 
     for i in range(0,pages):
-        print crawl(url_lists)
+        print(crawl(url_lists) )
         index = get_ptt_last_index(soup)
         soup = get_borad_content(res,board,index)
         url_lists = article_url_list(soup)
