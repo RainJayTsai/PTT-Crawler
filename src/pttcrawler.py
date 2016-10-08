@@ -33,30 +33,44 @@ def crawl(url_list,title=None):
 
     rslt = []
     # 送出GET請求到遠端伺服器，伺服器接受請求後回傳<Response [200]>，代表請求成功
-    for item in url_list:
-
+    for i,item in enumerate(url_list):
+        # print(item)
         ptt_content = res.get("https://www.ptt.cc/" + item )
 
         #get board Index html
         soup = BeautifulSoup( ptt_content.text, "html.parser")
 
         #get article
-        rslt.append( parse_article(soup) )
+        if title is None:
+            x = parse_article(soup)
+        else:
+            x = parse_article(soup,title[i])
+
+        x['url'] = item
+        rslt.append( x )
+
+    return rslt
 
 
 
-
-def parse_article(soup):
+def parse_article(soup, titlex=None):
 
     #find article all content
     main_content = soup.find("div", id='main-content')
 
     #find author, title, date
     metas = main_content.select('div.article-metaline')
+    author = ''
+    date = ''
+    if titlex is not None:
+        title = titlex
+    else:
+        title = ''
 
-    author = metas[0].select('span.article-meta-value')[0].string
-    title = metas[1].select('span.article-meta-value')[0].string
-    date = metas[2].select('span.article-meta-value')[0].string
+    if metas:
+        author = metas[0].select('span.article-meta-value')[0].string
+        title = metas[1].select('span.article-meta-value')[0].string
+        date = metas[2].select('span.article-meta-value')[0].string
 
     # delete information
     [x.extract() for x in metas]
@@ -91,8 +105,8 @@ def parse_article(soup):
         'push' : message,
     }
 
-    return json.dumps(article,indent=4, ensure_ascii=False,sort_keys=True,)
-
+    # return json.dumps(article,indent=4, ensure_ascii=False,sort_keys=True,)
+    return article
 
 def article_url_list(soup):
     divs = soup.find_all("div",{"class": "r-ent"})
@@ -109,7 +123,7 @@ def article_url_list(soup):
     return rslt_url, rslt_title
 
 def get_borad_content(res, board, index = ""):
-    content = res.get('https://www.ptt.cc/bbs/' + board + '/index' + index + '.html')
+    content = res.get('https://www.ptt.cc/bbs/' + board + '/index' + str(index) + '.html')
     soup = BeautifulSoup(content.text, "html.parser")
 
     return soup
