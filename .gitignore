@@ -137,3 +137,11 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+
+#project files
+*.xlsx
+*.7z
+*.csv
+*.json
+crawler_server/data/*
+

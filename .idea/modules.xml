@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/PTT-Crawler.iml" filepath="$PROJECT_DIR$/PTT-Crawler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/crawler_server/crawler_server.iml" filepath="$PROJECT_DIR$/crawler_server/crawler_server.iml" />
     </modules>
   </component>
 </project>
