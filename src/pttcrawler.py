@@ -37,76 +37,86 @@ def crawl(url_list,title=None):
         # print(item)
         ptt_content = res.get("https://www.ptt.cc/" + item )
 
-        #get board Index html
+        # get article error
+        if ptt_content.status_code != 200:
+            continue
+
+        #get atricle
         soup = BeautifulSoup( ptt_content.text, "html.parser")
 
-        #get article
+        #get article of json
         if title is None:
             x = parse_article(soup)
         else:
             x = parse_article(soup,title[i])
-
-        x['url'] = item
-        rslt.append( x )
+        if( x is not None):
+            x['url'] = item
+            rslt.append( x )
 
     return rslt
 
 
 
 def parse_article(soup, titlex=None):
+    try:
+        #find article all content
+        main_content = soup.find("div", id='main-content')
 
-    #find article all content
-    main_content = soup.find("div", id='main-content')
+        #find author, title, date
+        metas = main_content.select('div.article-metaline')
+        author = ''
+        date = ''
+        if titlex is not None:
+            title = titlex
+        else:
+            title = ''
 
-    #find author, title, date
-    metas = main_content.select('div.article-metaline')
-    author = ''
-    date = ''
-    if titlex is not None:
-        title = titlex
-    else:
-        title = ''
-
-    if metas:
-        author = metas[0].select('span.article-meta-value')[0].string
-        title = metas[1].select('span.article-meta-value')[0].string
-        date = metas[2].select('span.article-meta-value')[0].string
-
-    # delete information
-    [x.extract() for x in metas]
-    [x.extract() for x in main_content.select('.article-metaline-right')]
-    [x.extract() for x in main_content.select('span.f2')]
-
-    # push info to list and delete it from main_cotnet
-    pushlist = [x.extract() for x in main_content.select('div.push')]
-
-    # get article content
-    contents = main_content.get_text()
-
-    # push message
-    message = []
-    for item in pushlist:
-        # fix the push is too large bug
-        if not item.find('span',"push-tag"):
-            continue
-
-        message.append({ "push_tag": item.contents[0].string,
-          "user_id" : item.contents[1].string,
-          "push_content": item.contents[2].string ,
-          "push_ipdatetime":item.contents[3].string
-        })
+        if metas and len(metas) == 3:
+            author = metas[0].select('span.article-meta-value')[0].string
+            title = metas[1].select('span.article-meta-value')[0].string
+            date = metas[2].select('span.article-meta-value')[0].string
 
 
-    article = {
-        "author" : author,
-        "title" : title,
-        'date' : date,
-        'content' : contents,
-        'push' : message,
-    }
+        # delete information
+        [x.extract() for x in metas]
+        [x.extract() for x in main_content.select('.article-metaline-right')]
+        [x.extract() for x in main_content.select('span.f2')]
 
-    # return json.dumps(article,indent=4, ensure_ascii=False,sort_keys=True,)
-    return article
+        # push info to list and delete it from main_cotnet
+        pushlist = [x.extract() for x in main_content.select('div.push')]
+
+        # get article content
+        contents = main_content.get_text()
+
+        if contents == "":
+            return None
+
+        # push message
+        message = []
+        for item in pushlist:
+            # fix the push is too large bug
+            if not item.find('span',"push-tag"):
+                continue
+
+            message.append({ "push_tag": item.contents[0].string,
+              "user_id" : item.contents[1].string,
+              "push_content": item.contents[2].string ,
+              "push_ipdatetime":item.contents[3].string
+            })
+
+
+        article = {
+            "author" : author,
+            "title" : title,
+            'date' : date,
+            'content' : contents,
+            'push' : message,
+        }
+
+        # return json.dumps(article,indent=4, ensure_ascii=False,sort_keys=True,)
+        return article
+    except:
+        print("Error in Title: ",titlex)
 
 def article_url_list(soup):
     divs = soup.find_all("div",{"class": "r-ent"})
