@@ -25,8 +25,8 @@ from sklearn.svm import SVC
 
 
 path = "../soft_data/"
-start = 954
-end = 954+10
+start = 300
+end = 600
 
 
 title = []
@@ -35,7 +35,8 @@ title = []
 
 
 
-keywords = [ '徵才', 'Python', 'Java', '研替', '研發替', 'htc', '華碩', '台積電', '聯發科', 'mtk', 'qnap',  ]
+# keywords = [ '徵才', 'Python', 'Java', '研替', '研發替', 'htc', '華碩', '台積電', '聯發科', 'mtk', 'qnap',  ]
+keywords = []
 
 re_word = re.compile("\[[\u4e00-\u9fa5]*\]")
 
@@ -149,6 +150,6 @@ def handler_data():
     #         f.write(item + "\n")
 
 
-
+    print(tfidf.get_feature_names())
 
 handler_data()
