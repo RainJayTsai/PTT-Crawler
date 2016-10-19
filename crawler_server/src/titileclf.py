@@ -102,14 +102,16 @@ def clfTitle():
     with open("title_c2.csv",'r',encoding='utf-8') as f:
         for row in csv.reader(f,delimiter=','):
             if int(row[1]) == 0:
-                titleB.append(row[0])
+                titleB.append(preprocess(row[0]))
             else:
-                titleA.append( " ".join( jieba.cut( row[0] ) ) )
+                titleA.append( " ".join( jieba.cut( preprocess(row[0]), HMM=False ) ) )
+                if titleA[-1].lower().find("windos") != -1:
+                    print(titleA[-1])
                 A_label.append(int(row[1]))
 
     titleA.extend(keys)
     A_label.extend([1]*len(keys))
-    tfidf = TfidfVectorizer(sublinear_tf = True)
+    tfidf = TfidfVectorizer()
     clf = LinearSVC()
     # X = tfidf.fit_transform(titleA)
     # clf.fit(X,A_label)
@@ -160,10 +162,30 @@ def clfTitle():
 
 
 
+def preprocess(s):
+    s = timeprocess(s)
+    s = dateprocess(s)
+    s = symbolprocess(s)
+    return s
+
+def timeprocess(s):
+    return re.sub("([0-1]?[1-9]|2[0-3]\s*)([:|點]\s*)[0-5][0-9]","",s )
+
+def dateprocess(s):
+    s = re.sub("([0-9]+\s*(學年|年|/)\s*)?([0-9]+\s*(月|/)\s*)?([0-9]+(\s*日)?)?","",s)
+    s = re.sub("[1|2][0-9]{3}[\s*年]?","",s) #西元 1000-2999
+    return s
+
+def symbolprocess(s):
+    s = re.sub("/"," ", s )
+    s = re.sub("[^\w\s]+","",s)
+    return s
 
 if __name__ == '__main__':
 
     # saveTitleOneFile()
     # getFeature()
-    titletoCSV()
+    # titletoCSV()
     clfTitle()
+    # print(symbolprocess("中華電信獎百萬招募Android APP! 4/16說明會缺你不可!"))
+    # print(preprocess("宸海科技誠徵Android/JAVA工程師"))
