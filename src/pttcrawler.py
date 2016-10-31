@@ -30,12 +30,11 @@ def crawl(url_list,title=None):
 
     # get 18+ cookies
     res = getOver18cookie(res)
-
     rslt = []
     # 送出GET請求到遠端伺服器，伺服器接受請求後回傳<Response [200]>，代表請求成功
     for i,item in enumerate(url_list):
         # print(item)
-        ptt_content = res.get("https://www.ptt.cc/" + item )
+        ptt_content = res.get("https://www.ptt.cc/" + item)
 
         # get article error
         if ptt_content.status_code != 200:
@@ -86,6 +85,7 @@ def parse_article(soup, titlex=None):
         pushlist = [x.extract() for x in main_content.select('div.push')]
 
         # get article content
+        cf_email_decode(main_content)
         contents = main_content.get_text()
 
         if contents == "":
@@ -169,6 +169,28 @@ def main():
         index = get_ptt_last_index(soup)
         soup = get_borad_content(res,board,index)
         url_lists = article_url_list(soup)
+
+
+
+def cf_email_decode(soup):
+
+    def decodex(e):
+        de = ""
+        k = int(e[:2], 16)
+
+        for i in range(2, len(e)-1, 2):
+            de += chr(int(e[i:i+2], 16)^k)
+        return de
+
+
+    for item in soup.select('a.__cf_email__'):
+            cfemail = item.get('data-cfemail')
+            item.replace_with(decodex(cfemail))
+
+    [ x.extract() for x in soup.select('script[data-cfhash]') ]
+
+
+
 
 
 if __name__ == '__main__':
