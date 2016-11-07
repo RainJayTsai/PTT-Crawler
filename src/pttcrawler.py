@@ -202,7 +202,7 @@ def pttCrawler(board="", index="", pages=1, url=None):
         for i in range(0,pages):
             soup = get_board_content(res, board, index)
             url_lists, soft_title = article_url_list(soup)
-            rslt.append(crawl(url_lists,soft_title))
+            rslt.extend(crawl(url_lists,soft_title))
             index = index - 1
         return rslt
 
