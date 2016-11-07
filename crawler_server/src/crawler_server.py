@@ -22,7 +22,7 @@ start = timeit.default_timer()
 for i in range(0,100):
     print( "run time: " + str(i) +"\t index number:" + str(index) )
 
-    soft_soup = get_borad_content(soft_res, 'Soft_Job', index)
+    soft_soup = get_board_content(soft_res, 'Soft_Job', index)
     index = get_ptt_last_index(soft_soup)
 
     url_lists, soft_title = article_url_list(soft_soup)

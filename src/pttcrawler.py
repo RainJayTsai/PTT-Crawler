@@ -132,7 +132,7 @@ def article_url_list(soup):
             pass
     return rslt_url, rslt_title
 
-def get_borad_content(res, board, index = ""):
+def get_board_content(res, board, index =""):
     content = res.get('https://www.ptt.cc/bbs/' + board + '/index' + str(index) + '.html')
     soup = BeautifulSoup(content.text, "html.parser")
 
@@ -160,14 +160,14 @@ def main():
 
 
     #get article url
-    soup = get_borad_content(res, board)
+    soup = get_board_content(res, board)
     url_lists = article_url_list(soup)
 
 
     for i in range(0,pages):
         print(crawl(url_lists) )
         index = get_ptt_last_index(soup)
-        soup = get_borad_content(res,board,index)
+        soup = get_board_content(res, board, index)
         url_lists = article_url_list(soup)
 
 
@@ -190,8 +190,21 @@ def cf_email_decode(soup):
     [ x.extract() for x in soup.select('script[data-cfhash]') ]
 
 
+def pttCrawler(board, index="", pages=1, url=None):
+    if url:
+        url = url[url.lower().find('/bbs'):]
+        return crawl([url])
+    else:
+        res = requests.session()
+        res = getOver18cookie(res)
 
-
+        rslt = []
+        for i in range(0,pages):
+            soup = get_board_content(res, board, index)
+            url_lists, soft_title = article_url_list(soup)
+            rslt.append(crawl(url_lists,soft_title))
+            index = index - 1
+        return rslt
 
 if __name__ == '__main__':
     main()

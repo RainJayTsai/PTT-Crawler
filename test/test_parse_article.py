@@ -7,7 +7,7 @@ import requests
 import sys
 from bs4 import BeautifulSoup
 
-from pttcrawler import parse_article, getOver18cookie, article_url_list, main, get_borad_content, crawl
+from pttcrawler import parse_article, getOver18cookie, article_url_list, main, get_board_content, crawl
 
 
 class TestParse_article(TestCase):
@@ -19,7 +19,7 @@ class TestParse_article(TestCase):
 
     def test_url_list(self):
         import re
-        soup = get_borad_content(self.res, 'gossiping')
+        soup = get_board_content(self.res, 'gossiping')
         rslt = article_url_list( soup)
         REGEX = re.compile('/bbs/Gossiping/[A-Za-z0-9\.]*\.html$')
         for item in rslt:
@@ -39,7 +39,7 @@ class TestParse_article(TestCase):
 
 
         #get article url
-        soup = get_borad_content(self.res, 'gossiping')
+        soup = get_board_content(self.res, 'gossiping')
         self.url_lists = article_url_list(soup)
 
 
