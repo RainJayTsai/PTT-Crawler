@@ -99,7 +99,7 @@ def parse_article(soup, titlex=None):
                 continue
 
             message.append({ "push_tag": item.contents[0].string,
-              "user_id" : item.contents[1].string,
+              "push_id" : item.contents[1].string,
               "push_content": item.contents[2].string ,
               "push_ipdatetime":item.contents[3].string
             })
