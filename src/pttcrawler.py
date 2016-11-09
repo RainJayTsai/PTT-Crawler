@@ -190,7 +190,7 @@ def cf_email_decode(soup):
     [ x.extract() for x in soup.select('script[data-cfhash]') ]
 
 
-def pttCrawler(board="", index="", pages=1, url=None):
+def pttCrawler(index="", board="", pages=1, url=None):
     if url:
         url = url[url.lower().find('/bbs'):]
         return crawl([url])
