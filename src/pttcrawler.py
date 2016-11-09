@@ -71,7 +71,9 @@ def parse_article(soup, titlex=None):
             title = ''
 
         if metas and len(metas) == 3:
-            author = metas[0].select('span.article-meta-value')[0].string
+            author_ = metas[0].select('span.article-meta-value')[0].string
+            author = author_[:author_.find(' ')]
+            nick = author_[author_.find(' '):][2:-1]
             title = metas[1].select('span.article-meta-value')[0].string
             date = metas[2].select('span.article-meta-value')[0].string
 
@@ -107,6 +109,7 @@ def parse_article(soup, titlex=None):
 
         article = {
             "author" : author,
+            "nick" : nick,
             "title" : title,
             'date' : date,
             'content' : contents,
